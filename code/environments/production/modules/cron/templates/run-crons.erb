@@ -5,6 +5,7 @@ local persistent="<%= @persistent_directory %>"
 IFS=$'\n'
 export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"
 export SHELL="/bin/zsh"
+export HOME="/"
 
 function remove-lock() {
   rm -rf "$@"

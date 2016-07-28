@@ -7,10 +7,6 @@ export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"
 export SHELL="/bin/zsh"
 export HOME="/"
 
-function remove-lock() {
-  rm -rf "$@"
-}
-
 function seconds() {
   date +'%s'
 }
@@ -36,7 +32,7 @@ for file in $(find "$persistent" -type f -iname '*.seconds'); do
   fi
 
   for cron in $(find "/etc/cron.${period}" -type f -executable); do
-    "$cron"
+    "$cron" > /dev/null 2>&1 &
   done
 
   for cron in $(find "/etc/cron.${period}.once" -type f -executable); do
@@ -46,13 +42,9 @@ for file in $(find "$persistent" -type f -iname '*.seconds'); do
     if [[ -f "$lock" ]]; then
       continue
     fi
-    trap "remove-lock $lock" INT TERM EXIT
     touch "$lock"
 
-    "$cron"
-
-    remove-lock "$lock"
-    trap "true" INT TERM EXIT
+    "<%= @run_and_remove_lock %>" "$lock" "$cron" > /dev/null 2>&1 &
   done
 
   seconds > "$timestamp"

@@ -1,0 +1,16 @@
+#!/bin/zsh
+
+local lock="$1"
+shift
+
+if [[ ! -f "$lock" ]]; then
+	exit 1
+fi
+
+function remove-lock() {
+	rm -rf "$lock"
+}
+
+trap remove-lock INT TERM EXIT
+
+$@

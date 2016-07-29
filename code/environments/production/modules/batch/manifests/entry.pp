@@ -1,36 +1,34 @@
-# Creates an atd batch entry, similair to cron::entry.
-class batch::entry  (
+# Defines a batch entry to be run at a specified period.
+define batch::entry (
 
-  # What command to run.
+  # The command to run.
   String $command = undef,
 
-  # The period at which to run the command.
+  # Whether the command should be re-run if the previous command has not yet
+  # finished running.
+  Boolean $once = true,
+
+  # How often to run this command.
   String $period = undef,
 
-  # Whether to re-batch this command if it has already been batched.
-  Boolean $once = true,
 ) {
 
   require batch
 
-  case $period {
-    'hourly', 'daily', 'weekly', 'monthly': { $sanitized_period = $period }
-  }
+  $batch::periods.each |$valid_period, $seconds| {
+    if $period == $valid_period {
+      if $once {
+        $batch_directory = "/etc/batch.${period}.once"
+      } else {
+        $batch_directory = "/etc/batch.${period}"
+      }
 
-  if $once {
-    require batch::persistence
-
-    $batch_directory = "/etc/batch.${sanitized_period}.once"
-    $batch_template = 'batch/command.batch.once.erb'
-  } else {
-    $cron_directory = "/etc/batch.${sanitized_period}"
-    $cron_template = 'batch/command.batch.erb'
-  }
-
-  file { "${batch_directory}/puppet_${name}.batch":
-    ensure  => file,
-    content => template($cron_template),
-    mode    => '0755',
-    owner   => 'root',
+      file { "${batch_directory}/puppet_${name}.batch":
+        ensure  => file,
+        content => template('batch/command.batch.erb'),
+        mode    => '0755',
+        owner   => 'root',
+      }
+    }
   }
 }

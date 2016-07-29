@@ -8,4 +8,7 @@ class os::all {
 
   # Pretty issue file.
   include issue
+
+  # Fstrim support.
+  include fstrim
 }

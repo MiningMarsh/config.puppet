@@ -16,6 +16,14 @@ class batch::config {
     privileged => false,
   }
 
+  $batch_once_name = "${batch_name}-once"
+  $batch_once = script::path($batch_once_name, false)
+
+  script::install { $batch_once_name:
+    content    => template('batch/batch.once.erb'),
+    privileged => false,
+  }
+
   script::install { 'puppet-run-batchs':
     content => template('batch/run-batchs.erb'),
   }
@@ -38,5 +46,10 @@ class batch::config {
       ensure  => file,
       content => "${seconds}\n",
     }
+  }
+
+  file { '/etc/conf.d/atd':
+    ensure  => file,
+    content => file('batch/atd.conf'),
   }
 }

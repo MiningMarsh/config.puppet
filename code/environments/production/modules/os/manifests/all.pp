@@ -1,7 +1,7 @@
 class os::all {
 
   # Automatically update puppet on every machine.
-  cron::entry { 'puppet':
+  batch::entry { 'puppet':
     command => 'puppet apply /etc/puppetlabs/code/environments/production/site.pp',
     period  => daily
   }

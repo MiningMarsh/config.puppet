@@ -1,0 +1,24 @@
+#!/usr/bin/env zsh
+# This file is managed by puppet.
+
+local lock="$1"
+shift
+
+local homedir=~"$(whoami)"
+if [[ ! -e "$homedir" ]]; then
+    exit 1
+fi
+   
+local lockdir="$homedir/.batch"
+if [[ ! -e "$lockdir" ]]; then
+  mkdir -p "$lockdir"
+fi
+
+local lock="$lockdir/$lock.lock"
+
+if [[ -f "$lock" ]]; then
+  exit
+fi
+touch "$lock"
+
+echo PATH='"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"' "<%= @run_and_remove_lock %>" "$lock" $@ '>/dev/null 2>&1' | /usr/bin/batch >/dev/null 2>&1

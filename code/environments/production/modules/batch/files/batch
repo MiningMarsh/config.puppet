@@ -1,3 +1,4 @@
-#!/bin/zsh
+#!/usr/bin/env zsh
+# This file is managed by puppet.
 
 echo PATH='"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"' $@ '>/dev/null 2>&1' | /usr/bin/batch >/dev/null 2>&1

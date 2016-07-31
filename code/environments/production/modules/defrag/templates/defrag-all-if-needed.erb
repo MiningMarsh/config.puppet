@@ -1,0 +1,21 @@
+#!/usr/bin/env zsh
+# This file is managed by puppet.
+
+function filterRotational() {
+    IFS=$'\n'
+    while read disk; do
+        local baseDisk="$(basename "$disk" | egrep -o '[a-zA-Z]+')"
+        if [[ "$(cat /sys/block/$baseDisk/queue/rotational)" -eq 1 ]]; then
+            echo "$disk"
+        fi
+    done
+}
+
+mount |
+    grep 'type ext4' |
+    awk '{print $1}' |
+    sort |
+    uniq |
+    filterRotational |
+    xargs -P10 -n1 <%= @defrag_if_needed %>
+

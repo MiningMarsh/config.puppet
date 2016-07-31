@@ -11,6 +11,7 @@ define script::install (
 ) {
 
   require script
+  require script::shells
 
   $script = script::path($file, $privileged)
 

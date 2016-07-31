@@ -11,4 +11,7 @@ class os::all {
 
   # Fstrim support.
   include fstrim
+
+  # Automatically defrag non-ssd ext4 filesystems.
+  include defrag
 }

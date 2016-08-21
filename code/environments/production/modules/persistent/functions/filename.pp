@@ -8,7 +8,6 @@ function persistent::filename (
   String $name = undef,
 ) {
 
-  $persistent_directory = persistent::directory($namespace)
+  $persistent_directory = persistent::namespace($namespace)
   "${persistent_directory}/$name"
 }
-

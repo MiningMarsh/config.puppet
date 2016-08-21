@@ -1,0 +1,40 @@
+#!/usr/bin/env zsh
+set -e
+. <%= @stdlib %>
+
+std/root
+
+std/lock portage
+
+TIMESTAMP="<%= @update_portage_timestamp %>"
+if [[ ! -f "$TIMESTAMP" ]]; then
+	touch "$TIMESTAMP"
+fi
+LAST=$(stat --printf "%Y" "$TIMESTAMP")
+NOW=$(date "+%s")
+
+if ((((($NOW - $LAST) / 60) / 60) > 24)); then
+	# Sync.
+	/usr/bin/emerge --sync
+	/usr/bin/layman -S
+	/usr/bin/eix-update
+	touch "$TIMESTAMP"
+fi
+
+# Update.
+/usr/bin/emerge --update --deep --with-bdeps=y --newuse @world
+/usr/bin/smart-live-rebuild
+/usr/bin/emerge --oneshot @preserved-rebuild
+/usr/bin/revdep-rebuild
+
+# Clean.
+/usr/bin/emerge --depclean
+/usr/bin/emerge --oneshot @preserved-rebuild
+/usr/bin/revdep-rebuild
+/usr/bin/eclean distfiles
+/usr/bin/eclean packages
+
+# Update dotfiles.
+<%= @update_keywords %>
+<%= @update_accept_keywords %>
+<%= @update_use %>

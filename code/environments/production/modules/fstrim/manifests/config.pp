@@ -1,5 +1,5 @@
 class fstrim::config {
-  batch::entry { 'fstrim':
+  batch::entry { fstrim:
     command => 'fstrim -a',
     period  => hourly,
   }

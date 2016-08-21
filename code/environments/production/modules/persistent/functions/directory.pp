@@ -3,18 +3,17 @@ function persistent::directory (
 
   # The namespace to put this file under.
   String $namespace = undef,
+
+  # The directory name.
+  String $name = undef,
 ) {
 
-  include persistent
+  $persistent_directory = persistent::namespace($namespace)
+  $named_directory = "${persistent_directory}/${name}"
 
-  $namespace_directory = "${persistent::lib}/${namespace}"
-
-  unless defined(File[$namespace_directory]) {
-    file { $namespace_directory:
-      ensure => directory,
-    }
+  file { $named_directory:
+    ensure => directory,
   }
 
-  $namespace_directory
+  $named_directory
 }
-

@@ -11,9 +11,9 @@ function script::path (
   require script
 
   if $privileged {
-    $script = "${script::privileged_script_directory}/${name}"
+    $script = "${script::privileged_script_directory}/puppet-${name}"
   } else {
-    $script = "${script::script_directory}/${name}"
+    $script = "${script::script_directory}/puppet-${name}"
   }
 
   $script

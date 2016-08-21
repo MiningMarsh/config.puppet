@@ -1,8 +1,8 @@
 class batch::config {
 
-  $persistent_directory = persistent::directory('batch')
+  $persistent_directory = persistent::directory('batch', 'batch')
 
-  $run_and_remove_lock_name = 'puppet-batch-run-and-remove-lock'
+  $run_and_remove_lock_name = 'batch-run-and-remove-lock'
   script::install { $run_and_remove_lock_name:
     content => file('batch/run-and-remove-lock'),
   }
@@ -24,11 +24,11 @@ class batch::config {
     privileged => false,
   }
 
-  script::install { 'puppet-run-batchs':
+  script::install { 'run-batchs':
     content => template('batch/run-batchs.erb'),
   }
 
-  cron { 'puppet-run-batchs':
+  cron { 'run-batchs':
     command => script::path('puppet-run-batchs'),
     minute  => '*/10',
   }

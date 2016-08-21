@@ -1,0 +1,165 @@
+#!/usr/bin/env zsh
+. <%= @stdlib %>
+
+std/root
+
+std/lock use
+
+# The package.use directory.
+PUSE="/etc/portage/package.use/local"
+
+# Restore latest backup if for some godforsaken reason we nuked our use somehow
+# This is a shitty workaround for what I believe must be a bug in this file.
+if [[ ! -f "$PUSE/required" ]]; then
+    local latest
+    latest="$(echo "$PUSE".* | xargs -n1 echo | sort -n -r | head -n1)"
+    rm -rf "$PUSE"
+    cp -r "$latest" "$PUSE"
+fi
+
+# Generate a temporary file for containing use atoms.
+TEMP="$(mktemp)"
+
+# The new portage dir.
+NEW_PUSE="$(mktemp -d)"
+
+# Filters stdin to only include package atoms that are installed.
+function remove_packages() {
+    while read LINE
+    do
+	PACKAGE=$(echo "$LINE" | awk -e '{print $1}')
+
+	if equery -q l "$PACKAGE" > /dev/null
+	then
+	    echo "$LINE"
+	fi
+    done
+}
+
+# Get all the package atoms on the system, and copy them to the tempfile.
+find "$PUSE" -type f -exec cat '{}' ';' \
+    | sed -e '/^#/d' -e '/^$/d' \
+    | sort \
+    | uniq \
+    | remove_packages \
+    | tee "$TEMP" > /dev/null
+
+# Remove all the USE flags that are globally enabled from the use flags in the
+# temp file.
+# Build a sed expression list.
+SED_CMD="sed"
+for FLAG in $(portageq envvar USE)
+do
+    SED_CMD="${SED_CMD} -e 's/\s\+$FLAG\s\+/ /g' -e 's/\s\+$FLAG\$/ /g'"
+done
+NEW_TEMP=$(eval "$SED_CMD $TEMP")
+NEW_TEMP=$(echo "$NEW_TEMP" | sed -e 's/\s$//g')
+NEW_TEMP=$(echo "$NEW_TEMP" | sed -e '/^[-a-zA-Z0-9./:]*$/d')
+
+echo $NEW_TEMP > "$TEMP"
+
+NEW_TEMP=""
+
+# Sort all the use flags in the file, and remove any non-applicable use flags.
+while read LINE
+do
+    LINE_ELEMS=($(echo $LINE))
+
+    PACKAGE=$LINE_ELEMS[1]
+
+    unset 'LINE_ELEMS[1]'
+
+    UNSORTED=""
+    for ELEM in $LINE_ELEMS
+    do
+	UNSORTED="$UNSORTED
+		$ELEM"
+    done
+
+    SORTED=$(echo $UNSORTED | sort | uniq)
+
+    SORTED_ELEMS=($(echo $SORTED))
+
+    SORTED="$PACKAGE"
+
+    # TODO: Clean up this fucking mess.
+    # Get the package's use flags as an array.
+    PACKAGE_USE=($(portageq metadata / ebuild $(equery -q l "$PACKAGE") IUSE))
+    for ELEM in $SORTED_ELEMS; do
+
+	ELEM_CLEAN=$(echo $ELEM | sed -e 's/^\(+\|-\)//g')
+	for ELEM2 in $PACKAGE_USE; do
+
+	    ELEM2_CLEAN=$(echo $ELEM2 | sed -e 's/^\(+\|-\)//g')
+	    if ! [[ "$ELEM2_CLEAN" == "$ELEM2" ]]; then
+
+		if [[ "$ELEM_CLEAN" == "$ELEM2_CLEAN" ]]; then
+		    ELEM2_NO_PLUS=$(echo $ELEM2 | sed -e 's/^+//g')
+		    if ! [[ "$ELEM" == "$ELEM2_NO_PLUS" ]]; then
+			SORTED="$SORTED $ELEM"
+		    fi
+		fi
+	    else
+		if [[ "$ELEM_CLEAN" == "$ELEM2_CLEAN" ]]
+		then
+		    SORTED="$SORTED $ELEM"
+		fi
+	    fi
+	done
+    done
+
+    NEW_TEMP="$NEW_TEMP
+$SORTED"
+done < "$TEMP"
+
+NEW_TEMP=$(echo "$NEW_TEMP" | sed -e '/^[-a-zA-Z0-9./:]*$/d')
+echo $NEW_TEMP > "$TEMP"
+
+mkdir -p "$NEW_PUSE"
+
+grep -E '^(<|>|<=|>=|=)' "$TEMP" \
+    | tee "$NEW_PUSE"/required > /dev/null
+
+NEW_TEMP=$(grep -v -E '^(<|>|<=|>=|=)' "$TEMP")
+echo $NEW_TEMP > "$TEMP"
+
+while read LINE
+do
+    LINE_ELEMS=($(echo $LINE))
+    PACKAGE=$LINE_ELEMS[1]
+
+    unset 'LINE_ELEMS[1]'
+
+    USE=""
+    for ELEM in $LINE_ELEMS
+    do
+	USE="$USE $ELEM"
+    done
+
+    # If it turns out we filtered every USE flag, then just abort and skip
+    # this item
+    if [[ -z "${USE// }" ]]; then
+	continue
+    fi
+
+    PACKAGE_PREFIX=$(echo "$PACKAGE" | cut -f1 -d'/')
+    PACKAGE_NAME=$(echo "$PACKAGE" | cut -f2 -d'/')
+    mkdir -p "$NEW_PUSE/$PACKAGE_PREFIX"
+    echo "${PACKAGE}${USE}" >> "$NEW_PUSE/$PACKAGE"
+done  < "$TEMP"
+
+rm "$TEMP"
+mv "$PUSE" "$PUSE.$(date '+%y-%m-%d-%H-%M-%S')"
+mv "$NEW_PUSE" "$PUSE"
+
+# Only store 3 backups.
+echo "$PUSE."* | xargs -n1 echo | sort -n -r | tail -n+4 | xargs -n1 rm -rf
+
+# Restore latest backup if for some godforsaken reason we nuked our use somehow
+# This is a shitty workaround for what I believe must be a bug in this file.
+if [[ ! -f "$PUSE/required" ]]; then
+    local latest
+    latest="$(echo "$PUSE".* | xargs -n1 echo | sort -n -r | head -n1)"
+    rm -rf "$PUSE"
+    cp -r "$latest" "$PUSE"
+fi

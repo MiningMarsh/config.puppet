@@ -1,5 +1,5 @@
 class fstrim::install {
-  package { 'util-linux':
+  package { util-linux:
     ensure => installed,
   }
 }

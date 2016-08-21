@@ -1,5 +1,7 @@
 class script::shells {
-  $shells = ['zsh', 'bash']
+  require zsh
+
+  $shells = ['bash']
 
   $shells.each |$shell| {
     package { $shell:

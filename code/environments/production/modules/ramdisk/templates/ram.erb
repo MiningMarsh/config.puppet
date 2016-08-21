@@ -1,0 +1,28 @@
+#!/bin/zsh
+. <%= @stdlib %>
+
+std/root
+
+function init_start() {
+	mount -t tmpfs ram /mnt/ram -o defaults,size=8G
+
+	for user in $(std/users); do
+		mkdir -p /mnt/ram/"$user"
+		chown -hR "$user" /mnt/ram/"$user"
+
+		if [[ -f ~"$user"/.ramtab ]]; then
+			IFS=$'\n'
+			while read line; do
+				mkdir -p /mnt/ram/"$user"/"$line"
+				chown -hR "$user":"$user" /mnt/ram/"$user"/"$line"
+			done < ~"$user"/.ramtab
+			IFS=$' \n\t'
+		fi
+	done
+}
+
+function init_stop() {
+	umount /mnt/ram
+}
+
+init_$1

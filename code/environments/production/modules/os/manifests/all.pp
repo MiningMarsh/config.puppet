@@ -6,12 +6,15 @@ class os::all {
     period  => daily
   }
 
-  # Pretty issue file.
-  include issue
+  $features = [
+    'defrag',
+    'fstrim',
+    'issue',
+    'package',
+    'zsh',
+  ]
 
-  # Fstrim support.
-  include fstrim
-
-  # Automatically defrag non-ssd ext4 filesystems.
-  include defrag
+  $features.each |String $feature| {
+    include $feature
+  }
 }

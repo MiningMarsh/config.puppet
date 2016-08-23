@@ -11,13 +11,13 @@ define init::script (
     content => $content
   }
 
-  file { "${prefix}/puppet-${title}.start":
+  file { "${prefix}/puppet_${title}.start":
     content => template('init/script.start'),
     mode => '0755',
     ensure => file,
   }
 
-  file { "${prefix}/puppet-${title}.stop":
+  file { "${prefix}/puppet_${title}.stop":
     content => template('init/script.stop'),
     mode => '0755',
     ensure => file,

@@ -17,7 +17,6 @@ class package::config {
 
   $directories = [
     '/etc/portage/package.use',
-    '/etc/portage/package.accept_keywords',
     '/etc/portage/package.keywords',
   ]
 
@@ -35,11 +34,28 @@ class package::config {
     }
   }
 
+  file { '/etc/portage/package.accept_keywords':
+    ensure => directory,
+  } ->
+
+  file { '/etc/portage/package.accept_keywords/puppet':
+    ensure => directory,
+  } ->
+
+  file { '/etc/portage/package.accept_keywords/cvs':
+    ensure => directory,
+  } ->
+
+  file { '/etc/portage/package.accept_keywords/unstable':
+    ensure => directory,
+  }
+
   $scripts = [
     $update_portage_name,
     $update_use_name,
     $update_keywords_name,
-    $update_accept_keywords_name,
+    "${update_accept_keywords_name}-cvs",
+    "${update_accept_keywords_name}-unstable",
   ]
 
   $scripts.each |String $script| {

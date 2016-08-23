@@ -5,8 +5,8 @@ std/root
 
 std/lock accept-keywords
 
-PAK="/etc/portage/package.accept_keywords/local"
-BPAK="/etc/portage/backups/package.accept_keywords/"
+PAK="/etc/portage/package.accept_keywords/unstable"
+BPAK="/etc/portage/backups/package.accept_keywords/unstable/"
 mkdir -p "$BPAK"
 
 # Restore latest backup if for some godforsaken reason we nuked our use somehow
@@ -56,7 +56,7 @@ mkdir -p "$NEW_PAK"
 grep -E '^(<|>|<=|>=|=)' "$TEMP" \
    | tee "$NEW_PAK"/required > /dev/null
 
-sed -i -e 's/$/ **/g' "$NEW_PAK"/required
+sed -i -e 's/$/ ~amd64/g' "$NEW_PAK"/required
 
 NEW_TEMP=$(grep -v -E '^(<|>|<=|>=|=)' "$TEMP")
 echo $NEW_TEMP > "$TEMP"
@@ -72,7 +72,7 @@ do
 	PACKAGE_NAME=$(echo "$PACKAGE" | cut -f2 -d'/')
 	mkdir -p "$NEW_PAK/$PACKAGE_PREFIX"
 	if [[ "${PACKAGE}" != "" ]]; then
-		echo "${PACKAGE} "'**' >> "$NEW_PAK/$PACKAGE"
+		echo "${PACKAGE} "'~amd64' >> "$NEW_PAK/$PACKAGE"
 	fi
 done  < "$TEMP"
 

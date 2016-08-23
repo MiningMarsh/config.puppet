@@ -31,8 +31,8 @@ fi
 /usr/bin/emerge --depclean
 /usr/bin/emerge --oneshot @preserved-rebuild
 /usr/bin/revdep-rebuild
-/usr/bin/eclean distfiles
-/usr/bin/eclean packages
+/usr/bin/eclean -d distfiles -f
+/usr/bin/eclean -d packages
 
 # Update dotfiles.
 <%= @update_keywords %>

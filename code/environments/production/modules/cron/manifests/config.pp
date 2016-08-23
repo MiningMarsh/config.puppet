@@ -30,7 +30,7 @@ class cron::config {
       ensure => directory,
     }
 
-    file { persistent::filename('cron', "${period}.seconds"):
+    file { "${persistent_directory}/${period}.seconds":
       ensure  => file,
       content => "${seconds}\n",
     }

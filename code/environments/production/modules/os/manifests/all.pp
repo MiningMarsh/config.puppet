@@ -12,6 +12,8 @@ class os::all {
     'issue',
     'package',
     'zsh',
+    'cron',
+    'batch',
   ]
 
   $features.each |String $feature| {

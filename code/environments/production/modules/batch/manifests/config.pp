@@ -29,7 +29,7 @@ class batch::config {
   }
 
   cron { 'run-batchs':
-    command => script::path('puppet-run-batchs'),
+    command => script::path('run-batchs'),
     minute  => '*/10',
   }
 
@@ -42,7 +42,7 @@ class batch::config {
       ensure => directory,
     }
 
-    file { persistent::filename('batch', "${period}.seconds"):
+    file { "${persistent_directory}/${period}.seconds":
       ensure  => file,
       content => "${seconds}\n",
     }

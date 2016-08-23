@@ -7,12 +7,14 @@ std/lock use
 
 # The package.use directory.
 PUSE="/etc/portage/package.use/local"
+BUSE="/etc/portage/backups/package.use/"
+mkdir -p "$BUSE"
 
 # Restore latest backup if for some godforsaken reason we nuked our use somehow
 # This is a shitty workaround for what I believe must be a bug in this file.
 if [[ ! -f "$PUSE/required" ]]; then
     local latest
-    latest="$(echo "$PUSE".* | xargs -n1 echo | sort -n -r | head -n1)"
+    latest="$(echo "$BUSE"* | xargs -n1 echo | sort -n -r | head -n1)"
     rm -rf "$PUSE"
     cp -r "$latest" "$PUSE"
 fi
@@ -63,6 +65,10 @@ NEW_TEMP=""
 # Sort all the use flags in the file, and remove any non-applicable use flags.
 while read LINE
 do
+    if [[ -z "$LINE" ]]; then
+	continue
+    fi
+
     LINE_ELEMS=($(echo $LINE))
 
     PACKAGE=$LINE_ELEMS[1]
@@ -149,17 +155,17 @@ do
 done  < "$TEMP"
 
 rm "$TEMP"
-mv "$PUSE" "$PUSE.$(date '+%y-%m-%d-%H-%M-%S')"
+mv "$PUSE" "$BUSE$(date '+%y-%m-%d-%H-%M-%S')"
 mv "$NEW_PUSE" "$PUSE"
 
 # Only store 3 backups.
-echo "$PUSE."* | xargs -n1 echo | sort -n -r | tail -n+4 | xargs -n1 rm -rf
+echo "$BUSE"* | xargs -n1 echo | sort -n -r | tail -n+4 | xargs -n1 rm -rf
 
 # Restore latest backup if for some godforsaken reason we nuked our use somehow
 # This is a shitty workaround for what I believe must be a bug in this file.
 if [[ ! -f "$PUSE/required" ]]; then
     local latest
-    latest="$(echo "$PUSE".* | xargs -n1 echo | sort -n -r | head -n1)"
+    latest="$(echo "$BUSE"* | xargs -n1 echo | sort -n -r | head -n1)"
     rm -rf "$PUSE"
     cp -r "$latest" "$PUSE"
 fi

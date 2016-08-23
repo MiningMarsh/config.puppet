@@ -6,12 +6,14 @@ std/root
 std/lock keywords
 
 PAK="/etc/portage/package.keywords/local"
+BPAK="/etc/portage/backups/package.keywords/"
+mkdir -p "$BPAK"
 
 # Restore latest backup if for some godforsaken reason we nuked our use somehow
 # This is a shitty workaround for what I believe must be a bug in this file.
 if [[ ! -f "$PAK/required" ]]; then
 	local latest
-	latest="$(echo "$PAK".* | xargs -n1 echo | sort -n -r | head -n1)"
+	latest="$(echo "$BPAK"* | xargs -n1 echo | sort -n -r | head -n1)"
 	rm -rf "$PAK"
 	cp -r "$latest" "$PAK"
 fi
@@ -61,6 +63,10 @@ echo $NEW_TEMP > "$TEMP"
 
 while read LINE
 do
+	if [[ -z "$LINE" ]]; then
+		continue
+	fi
+
 	PACKAGE="$LINE"
 	PACKAGE_PREFIX=$(echo "$PACKAGE" | cut -f1 -d'/')
 	PACKAGE_NAME=$(echo "$PACKAGE" | cut -f2 -d'/')
@@ -71,17 +77,17 @@ do
 done  < "$TEMP"
 
 rm "$TEMP"
-mv "$PAK" "$PAK.$(date '+%y-%m-%d-%H-%M-%S')"
+mv "$PAK" "$BPAK$(date '+%y-%m-%d-%H-%M-%S')"
 mv "$NEW_PAK" "$PAK"
 
 # Only store 3 backups.
-echo "$PAK."* | xargs -n1 echo | sort -n -r | tail -n+4 | xargs -n1 rm -rf
+echo "$BPAK"* | xargs -n1 echo | sort -n -r | tail -n+4 | xargs -n1 rm -rf
 
 # Restore latest backup if for some godforsaken reason we nuked our use somehow
 # This is a shitty workaround for what I believe must be a bug in this file.
 if [[ ! -f "$PAK/required" ]]; then
 	local latest
-	latest="$(echo "$PAK".* | xargs -n1 echo | sort -n -r | head -n1)"
+	latest="$(echo "$BPAK"* | xargs -n1 echo | sort -n -r | head -n1)"
 	rm -rf "$PAK"
 	cp -r "$latest" "$PAK"
 fi

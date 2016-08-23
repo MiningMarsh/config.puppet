@@ -1,6 +1,10 @@
 #!/usr/bin/env zsh
 # This file is managed by puppet.
 
+if [[ -z "$@" ]]; then
+	exit 0
+fi
+
 local score="$(e4defrag -c "$@" | grep "Fragmentation score" | egrep -o '[0-9]+')"
 
 if [[ "$score" -gt 30 ]]; then

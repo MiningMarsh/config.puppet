@@ -33,22 +33,69 @@ function std/onceAround() {
     touch "$lock"
 }
 
+function std/lockAround() {
+    local lock="$1"
+
+    std/onceAround "$lock"
+
+    std/defer rm -rf "$lock"
+}
+
+function std/ramDiskMounted() {
+    mount | grep /mnt/ram | grep -q tmpfs
+}
+
+function std/_getGlobalLockPath() {
+    local name="$(std/_sanitizePath "$1")"
+    local locks="/var/lock/zsh.stdlib"
+
+    # Make sure our lock directory exists.
+    mkdir -p "$locks"
+
+    # Make sure everyone can touch the global path
+    chmod 777 "$locks"
+
+    # Return the lock path.
+    echo "$locks/$name.lock"
+}
+
+function std/_getLocalLockPath() {
+    local name="$(std/_sanitizePath "$1")"
+
+    # Get the global lock lock name.
+    local globalName="$(std/_getGlobalLockPath "$name").$(whoami)"
+
+    # If a global local lock was created at some point, return that now.
+    if [[ -e "$globalName" ]]; then
+	echo "$globalName"
+	return 0
+    fi
+
+    # If the RAM disk has not yet been mounted, use a /var/lock lock.
+    if ! std/ramDiskMounted; then
+	echo "$globalName"
+	return 0
+    fi
+
+    local locks="/mnt/ram/$(whoami)/Locks"
+
+    # Make sure our lockpath exists.
+    mkdir -p "$locks"
+
+    # Return the local lock path name.
+    echo "$locks/$name.lock"
+}
+
 function std/once() {
     local name="$1"
-    local locks="/mnt/ram/$(whoami)/Locks"
-    local lock="$locks/$(std/_sanitizePath "$name").once.lock"
 
-    mkdir -p "$locks"
-    std/onceAround "$lock"
+    std/onceAround "$(std/_getLocalLockPath "$name").once"
 }
 
 function std/start() {
     local name="$1"
-    shift
-    local locks="/mnt/ram/$(whoami)/Locks"
-    local lock="$locks/$(std/_sanitizePath "$name").pid"
+    local lock="$(std/_getLocalLockPath "$name").pid"
 
-    mkdir -p "$locks"
     $@ &
     local ret="$!"
     std/onceAround "$lock"
@@ -57,8 +104,7 @@ function std/start() {
 
 function std/stop() {
     local name="$1"
-    local locks="/mnt/ram/$(whoami)/Locks"
-    local lock="$locks/$(std/_sanitizePath "$name").pid"
+    local lock="$(std/_getLocalLockPath "$name").pid"
 
     if [[ ! -f "$lock" ]]; then
         exit
@@ -68,21 +114,9 @@ function std/stop() {
     rm -rf "$lock"
 }
 
-function std/lockAround() {
-    local lock="$1"
-
-    std/onceAround "$lock"
-
-    std/defer rm -rf "$lock"
-}
-
 function std/lock() {
     local name="$1"
-    local locks="/mnt/ram/$(whoami)/Locks"
-    local lock="$locks/$(std/_sanitizePath "$name").lock"
-
-    mkdir -p "$locks"
-    std/lockAround "$lock"
+    std/lockAround "$(std/_getLocalLockPath "$name")"
 }
 
 function std/_sanitizePath() {
@@ -107,7 +141,7 @@ function std/runDir() {
 
 function std/applyDir() {
     local func="$1"
-    shift 
+    shift
     local dir="$1"
     shift
 

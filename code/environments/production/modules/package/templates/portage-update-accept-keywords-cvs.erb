@@ -91,3 +91,7 @@ if [[ ! -f "$PAK/required" ]]; then
 	rm -rf "$PAK"
 	cp -r "$latest" "$PAK"
 fi
+
+# Restore permissions.
+chown portage:portage -R /etc/portage/package.accept_keywords
+chmod 755 -R /etc/portage/package.accept_keywords

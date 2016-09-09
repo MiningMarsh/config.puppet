@@ -169,3 +169,7 @@ if [[ ! -f "$PUSE/required" ]]; then
     rm -rf "$PUSE"
     cp -r "$latest" "$PUSE"
 fi
+
+# Restore permissions.
+chown portage:portage -R /etc/portage/package.use
+chmod 755 -R /etc/portage/package.use

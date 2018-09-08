@@ -1,0 +1,16 @@
+#!/bin/zsh
+. <%= @stdlib %>
+
+std/root
+
+function init_start() {
+	rm -rf /root/.batch
+	mkdir -p /root/.batch
+        mount -t tmpfs batch /root/.batch -o defaults,size=8G
+}
+
+function init_stop() {
+        umount /root/.batch
+}
+
+init_$1

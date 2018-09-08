@@ -1,4 +1,11 @@
 class package::install {
+	include zsh
+	$stdlib = zsh::stdlib()
+
+	init::script { clean-batch:
+		content => template('package/clean-batch.erb')
+	}
+
 
 	$packages = [
 		'eix',

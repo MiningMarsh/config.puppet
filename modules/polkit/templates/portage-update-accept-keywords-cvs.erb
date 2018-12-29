@@ -1,0 +1,97 @@
+#!/bin/zsh
+. <%= @stdlib %>
+
+std/root
+
+std/lock accept-keywords
+
+PAK="/etc/portage/package.accept_keywords/cvs"
+BPAK="/etc/portage/backups/package.accept_keywords/cvs/"
+mkdir -p "$BPAK"
+
+# Restore latest backup if for some godforsaken reason we nuked our use somehow
+# This is a shitty workaround for what I believe must be a bug in this file.
+if [[ ! -f "$PAK/required" ]]; then
+	local latest
+	latest="$(echo "$BPAK"* | xargs -n1 echo | sort -n -r | head -n1)"
+	rm -rf "$PAK"
+	cp -r "$latest" "$PAK"
+fi
+
+# Generate a temporary file for containing use atoms.
+TEMP="$(mktemp)"
+
+# The new portage dir.
+NEW_PAK="$(mktemp -d)"
+
+# Filters stdin to only include package atoms that are installed.
+function remove_packages() {
+	while read LINE
+	do
+		PACKAGE=$(echo "$LINE" | awk -e '{print $1}')
+
+		if equery -q l "$PACKAGE" > /dev/null
+		then
+			echo "$LINE"
+		fi
+	done
+}
+
+# Get all the package atoms on the system, and copy them to the tempfile.
+find "$PAK" -type f -exec cat '{}' ';' \
+   | sed -e '/^#/d' -e '/^$/d' \
+   | awk '{print $1}' \
+   | sort \
+   | uniq \
+   | remove_packages \
+   | tee "$TEMP" > /dev/null
+
+NEW_TEMP=$(cat "$TEMP" | sed -e 's/\s\+//g')
+echo $NEW_TEMP > "$TEMP"
+
+NEW_TEMP=""
+
+mkdir -p "$NEW_PAK"
+
+grep -E '^(<|>|<=|>=|=)' "$TEMP" \
+   | tee "$NEW_PAK"/required > /dev/null
+
+sed -i -e 's/$/ **/g' "$NEW_PAK"/required
+
+NEW_TEMP=$(grep -v -E '^(<|>|<=|>=|=)' "$TEMP")
+echo $NEW_TEMP > "$TEMP"
+
+while read LINE
+do
+	if [[ -z "$LINE" ]]; then
+		continue
+	fi
+
+	PACKAGE="$LINE"
+	PACKAGE_PREFIX=$(echo "$PACKAGE" | cut -f1 -d'/')
+	PACKAGE_NAME=$(echo "$PACKAGE" | cut -f2 -d'/')
+	mkdir -p "$NEW_PAK/$PACKAGE_PREFIX"
+	if [[ "${PACKAGE}" != "" ]]; then
+		echo "${PACKAGE} "'**' >> "$NEW_PAK/$PACKAGE"
+	fi
+done  < "$TEMP"
+
+rm "$TEMP"
+mv "$PAK" "$BPAK$(date '+%y-%m-%d-%H-%M-%S')"
+mv "$NEW_PAK" "$PAK"
+
+# Only store 3 backups.
+echo "$BPAK"* | xargs -n1 echo | sort -n -r | tail -n+4 | xargs -n1 rm -rf
+
+# Restore latest backup if for some godforsaken reason we nuked our use somehow
+# This is a shitty workaround for what I believe must be a bug in this file.
+if [[ ! -f "$PAK/required" ]]; then
+	local latest
+	latest="$(echo "$BPAK"* | xargs -n1 echo | sort -n -r | head -n1)"
+	rm -rf "$PAK"
+	cp -r "$latest" "$PAK"
+fi
+
+# Restore permissions.
+chown portage:portage -R /etc/portage/package.accept_keywords
+chmod 755 -R /etc/portage/package.accept_keywords

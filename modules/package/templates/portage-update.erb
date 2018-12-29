@@ -1,0 +1,50 @@
+#!/usr/bin/env zsh
+set -e
+. <%= @stdlib %>
+
+std/root
+
+std/lock portage
+
+TIMESTAMP="<%= @update_portage_timestamp %>"
+if [[ ! -f "$TIMESTAMP" ]]; then
+	touch "$TIMESTAMP"
+fi
+LAST=$(stat --printf "%Y" "$TIMESTAMP")
+NOW=$(date "+%s")
+
+if ((((($NOW - $LAST) / 60) / 60) > 24)); then
+	# Sync.
+	/usr/bin/emerge --sync
+	/usr/bin/layman -S
+	/usr/bin/eix-update
+	touch "$TIMESTAMP"
+fi
+
+local function update() {
+	/usr/bin/emerge --update --deep --with-bdeps=y --newuse --oneshot $@
+}
+
+# Update portage first, to make sure we support all EAPI versions.
+update portage
+
+# Update everything.
+update @world @smart-live-rebuild
+
+# Try to fix any missing packages or such.
+/usr/bin/emerge --oneshot --update @unavailable
+/usr/bin/emerge --oneshot @preserved-rebuild
+/usr/bin/revdep-rebuild
+
+# Clean.
+/usr/bin/emerge --depclean
+/usr/bin/emerge --oneshot @preserved-rebuild
+/usr/bin/revdep-rebuild
+/usr/bin/eclean -d distfiles -f
+/usr/bin/eclean -d packages
+
+# Update dotfiles.
+<%= @update_keywords %>
+<%= @update_accept_keywords %>-cvs
+<%= @update_accept_keywords %>-unstable
+<%= @update_use %>

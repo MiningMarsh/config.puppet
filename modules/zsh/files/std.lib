@@ -1,0 +1,125 @@
+#!/bin/zsh
+
+function std/_exit() {
+    exit 0
+}
+
+trap std/_exit INT TERM ERR
+
+function std/appendToFunction() {
+    local func="$1"
+    shift
+    functions[$func]=' '"$@"'; '"$functions[$func]"';'
+}
+
+function std/defer() {
+    std/appendToFunction std/_exit $@
+}
+
+function std/root() {
+    if [[ "$(whoami)" != "root" ]] ; then
+	echo "This script must be run as root!"
+	exit 1
+    fi
+}
+
+function std/onceAround() {
+    local lock="$1"
+
+    if [[ -f "$lock" ]]; then
+	exit 0
+    fi
+
+    touch "$lock"
+}
+
+function std/lockAround() {
+    local lock="$1"
+
+    std/onceAround "$lock"
+
+    std/defer rm -rf "$lock"
+}
+
+function std/_getGlobalLockPath() {
+    local name="$(std/_sanitizePath "$1")"
+    echo "/var/lock/zsh.stdlib.$name.lock"
+}
+
+function std/_getLocalLockPath() {
+    local name="$(std/_sanitizePath "$1")"
+    echo "$(std/_getGlobalLockPath "$name").$(whoami)"
+}
+
+function std/once() {
+    local name="$1"
+
+    std/onceAround "$(std/_getLocalLockPath "$name").once"
+}
+
+function std/start() {
+    local name="$1"
+    local lock="$(std/_getLocalLockPath "$name").pid"
+
+    $@ &
+    local ret="$!"
+    std/onceAround "$lock"
+    echo "$ret" > "$lock"
+}
+
+function std/stop() {
+    local name="$1"
+    local lock="$(std/_getLocalLockPath "$name").pid"
+
+    if [[ ! -f "$lock" ]]; then
+        exit
+    fi
+
+    kill "$(cat "$lock")"
+    rm -rf "$lock"
+}
+
+function std/lock() {
+    local name="$1"
+    std/lockAround "$(std/_getLocalLockPath "$name")"
+}
+
+function std/_sanitizePath() {
+    local toSanitize="$1"
+
+    echo "$toSanitize" | sed -e 's;/;!;g' -e 's; ;_;g'
+}
+
+function std/runDir() {
+    local rund="$1"
+    shift
+
+    local oldifs="$IFS"
+    IFS=$'\n'
+    for file in $(ls "$rund"/); do
+        IFS="$oldifs"
+        "$rund"/"$file" $@
+        IFS=$'\n'
+    done
+    IFS="$oldifs"
+}
+
+function std/applyDir() {
+    local func="$1"
+    shift
+    local dir="$1"
+    shift
+
+    local oldifs="$IFS"
+    IFS=$'\n'
+    for file in $(ls "$dir"/); do
+        IFS="$oldifs"
+        "$func" "$dir"/"$file" $@
+        IFS=$'\n'
+    done
+    IFS="$oldifs"
+}
+
+function std/users() {
+    cat /etc/passwd | cut -f1 -d:
+}

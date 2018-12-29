@@ -1,0 +1,51 @@
+#!/usr/bin/env zsh
+
+local persistent="<%= @persistent_directory %>"
+
+IFS=$'\0'
+export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"
+export SHELL="/bin/zsh"
+export HOME="/"
+
+function seconds() {
+  date +'%s'
+}
+
+for file in $(find "$persistent" -type f -iname '*.seconds' -print0); do
+  if [[ -z "$file" ]]; then
+    continue
+  fi
+
+  local period="$(echo "$file" | egrep -o '[^/]+$' | egrep -o '^[^.]+')"
+  local timestamp="$persistent/$period.timestamp"
+
+  if [[ ! -f "$timestamp" ]]; then
+    echo 0 > "$timestamp"
+  fi
+
+  local last="$(cat "$timestamp")"
+  local span="$(cat "$file")"
+  local current="$(seconds)"
+
+  if (( current - span < last )); then
+    continue
+  fi
+
+  for cron in $(find "/etc/cron.${period}" -type f -executable -print0); do
+
+    if [[ -z "$cron" ]]; then
+      continue
+    fi
+   
+    local lock="$persistent/$(basename "$cron").lock"
+
+    if [[ -f "$lock" ]]; then
+      continue
+    fi
+    touch "$lock"
+
+    "<%= @run_and_remove_lock %>" "$lock" "$cron" > /dev/null 2>&1 &
+  done
+
+  seconds > "$timestamp"
+done

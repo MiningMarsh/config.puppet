@@ -1,0 +1,14 @@
+{
+	"name": "miningmarsh",
+	"version": "0.0.1",
+	"summary": "MiningMarsh's personal puppet config.",
+	"author": "MiningMarsh",
+	"description": "",
+	"dependencies": [
+		"puppet-stdlib",
+		"puppet-cron"
+	],
+	"types": [],
+	"source": "git@github.com:MiningMarsh/config.puppet.git",
+	"project_page": "https://github.com/MiningMarsh/config.puppet"
+}

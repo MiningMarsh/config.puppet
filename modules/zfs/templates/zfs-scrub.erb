@@ -1,0 +1,4 @@
+#!/usr/bin/env zsh
+# This file is managed by puppet. Manual edits will be lost.
+
+zpool list -o name -H | xargs -n1 zpool scrub

@@ -1,10 +1,11 @@
 class batch {
 
   $periods = {
-    'hourly'  => 60 * 60,
-    'daily'   => 60 * 60 * 24,
-    'weekly'  => 60 * 60 * 24 * 7,
-    'monthly' => 60 * 60 * 24 * 31,
+    'frequently' => 15 * 60,
+    'hourly'   => 60 * 60,
+    'daily'    => 60 * 60 * 24,
+    'weekly'   => 60 * 60 * 24 * 7,
+    'monthly'  => 60 * 60 * 24 * 31,
   }
 
   include batch::install

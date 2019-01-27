@@ -42,7 +42,6 @@ for file in $(find "$persistent" -type f -iname '*.seconds' -print0); do
     if [[ -f "$lock" ]]; then
       continue
     fi
-    touch "$lock"
 
     "<%= @run_and_remove_lock %>" "$lock" "$cron" > /dev/null 2>&1 &
   done

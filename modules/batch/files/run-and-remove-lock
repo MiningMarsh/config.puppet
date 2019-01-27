@@ -14,4 +14,7 @@ function remove-lock() {
 
 trap remove-lock INT TERM EXIT
 
-$@
+$@ > /dev/null 2>&1 &
+echo $! > "$lock"
+wait
+remove-lock

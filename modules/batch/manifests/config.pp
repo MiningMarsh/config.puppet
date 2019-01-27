@@ -30,7 +30,7 @@ class batch::config {
 
   cron::job { 'run-batchs':
     command => script::path('run-batchs'),
-    minute => '10',
+    minute => '*/10',
   }
 
   $batch::periods.each |$period, $seconds| {

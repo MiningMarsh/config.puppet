@@ -4,7 +4,7 @@
 local lock="$1"
 shift
 
-if [[ ! -f "$lock" ]]; then
+if [[ -f "$lock" ]]; then
 	exit 1
 fi
 
@@ -12,7 +12,7 @@ function remove-lock() {
 	rm -rf "$lock"
 }
 
-trap remove-lock INT TERM EXIT
+trap remove-lock INT TERM ERR
 
 $@ > /dev/null 2>&1 &
 echo $! > "$lock"

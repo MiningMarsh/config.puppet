@@ -48,3 +48,5 @@ for file in $(find "$persistent" -type f -iname '*.seconds' -print0); do
 
   seconds > "$timestamp"
 done
+
+wait

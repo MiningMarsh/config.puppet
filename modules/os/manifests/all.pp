@@ -2,7 +2,7 @@ class os::all {
 
   # Automatically update puppet on every machine.
   batch::entry { 'puppet':
-    command => 'puppet apply --modulepath=/etc/puppet/modules /etc/puppet/site.pp',
+    command => 'cd /etc/puppet; git pull; puppet apply --modulepath=/etc/puppet/modules /etc/puppet/site.pp',
     period  => daily
   }
 

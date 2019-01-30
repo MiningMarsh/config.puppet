@@ -1,5 +1,4 @@
 #!/usr/bin/env zsh
-set -e
 . <%= @stdlib %>
 
 std/root
@@ -15,10 +14,10 @@ NOW=$(date "+%s")
 
 if ((((($NOW - $LAST) / 60) / 60) > 24)); then
 	# Sync.
-	/usr/bin/emerge --sync
-	/usr/bin/layman -S
-	/usr/bin/eix-update
-	touch "$TIMESTAMP"
+	/usr/bin/emerge --sync && /usr/bin/layman -S && /usr/bin/eix-update
+	if [[ $? -eq 0 ]]; then
+		touch "$TIMESTAMP"
+	fi
 fi
 
 local function update() {
@@ -26,22 +25,21 @@ local function update() {
 }
 
 # Update portage first, to make sure we support all EAPI versions.
-update portage
+update portage || true
 
 # Update everything.
-update @world @smart-live-rebuild
+update @world || true
+smart-live-rebuild || true
 
 # Try to fix any missing packages or such.
-/usr/bin/emerge --oneshot --update @unavailable
-/usr/bin/emerge --oneshot @preserved-rebuild
-/usr/bin/revdep-rebuild
+/usr/bin/emerge --oneshot --update @unavailable || true
+/usr/bin/emerge --oneshot @preserved-rebuild || true
+/usr/bin/revdep-rebuild || true
 
 # Clean.
-/usr/bin/emerge --depclean
-/usr/bin/emerge --oneshot @preserved-rebuild
-/usr/bin/revdep-rebuild
-/usr/bin/eclean -d distfiles -f
-/usr/bin/eclean -d packages
+/usr/bin/emerge --depclean || true
+/usr/bin/eclean -d distfiles -f || true
+/usr/bin/eclean -d packages || true
 
 # Update dotfiles.
 <%= @update_keywords %>

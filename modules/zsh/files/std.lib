@@ -4,7 +4,7 @@ function std/_exit() {
     exit 0
 }
 
-trap std/_exit INT TERM ERR
+trap std/_exit INT TERM ERR EXIT
 
 function std/appendToFunction() {
     local func="$1"

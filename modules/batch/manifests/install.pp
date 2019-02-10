@@ -1,7 +1,12 @@
 class batch::install {
-  $package = 'at'
+	$packages = [
+		'at',
+		'libcgroup',
+	]
 
-  package { $package:
-    ensure => installed,
-  }
+	$packages.each |String $package| {
+		package { $package:
+			ensure => installed,
+		}
+	}
 }

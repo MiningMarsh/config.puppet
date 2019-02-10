@@ -20,4 +20,8 @@ if [[ -f "$lock" ]]; then
   exit
 fi
 
-echo PATH='"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"' "<%= @run_and_remove_lock %>" "$lock" $@ '>/dev/null 2>&1' | /usr/bin/batch >/dev/null 2>&1
+if [[ "$(whoami)" == root ]]; then
+	echo PATH='"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"' cgexec -g cpuset:puppet-batch "<%= @run_and_remove_lock %>" "$lock" $@ '>/dev/null 2>&1' | /usr/bin/batch >/dev/null 2>&1
+else
+	echo PATH='"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"' "<%= @run_and_remove_lock %>" "$lock" $@ '>/dev/null 2>&1' | /usr/bin/batch >/dev/null 2>&1
+fi

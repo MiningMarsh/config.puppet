@@ -48,4 +48,9 @@ class batch::config {
     ensure  => file,
     content => file('batch/atd.conf'),
   }
+
+  file { '/etc/cgroup/cgconfig.conf':
+    ensure => file,
+    content => file('batch/cgconfig.conf'),
+  }
 }

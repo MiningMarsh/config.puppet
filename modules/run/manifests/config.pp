@@ -18,7 +18,7 @@ class run::config {
 
   cron::job { 'run-crons':
     command => script::path('run-crons'),
-    minute  => '10',
+    minute  => '*/10',
   }
 
   $run::periods.each |$period, $seconds| {

@@ -1,6 +1,7 @@
 class run {
 
   $periods = {
+    'frequently' => 15 * 60,
     'hourly'  => 60 * 60,
     'daily'   => 60 * 60 * 24,
     'weekly'  => 60 * 60 * 24 * 7,

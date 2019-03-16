@@ -43,7 +43,11 @@ for file in $(find "$persistent" -type f -iname '*.seconds' -print0); do
       continue
     fi
 
-    "<%= @run_and_remove_lock %>" "$lock" "$cron" > /dev/null 2>&1 &
+    echo >> /var/log/cron.log
+    date >> /var/log/cron.log
+    date '+%s' >> /var/log/cron.log
+    echo "<%= @run_and_remove_lock %>" "$lock" "$cron" >> /var/log/cron.log
+    "<%= @run_and_remove_lock %>" "$lock" "$cron" >> /var/log/cron.log 2>&1
   done
 
   seconds > "$timestamp"

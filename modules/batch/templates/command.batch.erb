@@ -3,4 +3,8 @@
 
 PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"
 
-<%= @command %>
+echo >> /var/log/batch-jobs.log
+date >> /var/log/batch-jobs.log
+date '+%s' >> /var/log/batch-jobs.log
+echo <%= @command %> >> /var/log/batch-jobs.log
+<%= @command %> >> /var/log/batch-jobs.log 2>&1

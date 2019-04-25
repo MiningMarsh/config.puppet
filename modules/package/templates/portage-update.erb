@@ -6,21 +6,10 @@ std/root
 std/lock portage
 
 NOW=$(date "+%s")
-TIMESTAMP="<%= @update_portage_timestamp %>"
-if [[ ! -f "$TIMESTAMP" ]]; then
-	echo "$NOW" > "$TIMESTAMP"
-fi
-if [[ ! -S "$TIMESTMAP" ]]; then
-	echo "$NOW" > "$TIMESTAMP"
-fi
-LAST=$(cat "$TIMESTAMP")
+LAST=$(</usr/portage/metadata/timestamp.x awk '{print $1}')
 
 if ((((( $NOW - $LAST ) / 60 ) / 60 ) > 24 )); then
-	# Sync.
 	/usr/bin/emerge --sync && /usr/bin/layman -S && /usr/bin/eix-update
-	if [[ $? -eq 0 ]]; then
-		echo "$NOW" > "$TIMESTAMP"
-	fi
 fi
 
 local function update() {

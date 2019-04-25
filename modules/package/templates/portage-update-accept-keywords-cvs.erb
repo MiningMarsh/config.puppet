@@ -7,6 +7,7 @@ std/lock accept-keywords
 
 PAK="/etc/portage/package.accept_keywords/cvs"
 BPAK="/etc/portage/backups/package.accept_keywords/cvs/"
+mkdir -p "$PAK"
 mkdir -p "$BPAK"
 
 # Restore latest backup if for some godforsaken reason we nuked our use somehow

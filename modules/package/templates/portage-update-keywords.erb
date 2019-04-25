@@ -5,8 +5,9 @@ std/root
 
 std/lock keywords
 
-PAK="/etc/portage/package.keywords/local"
+PAK="/etc/portage/package.keywords/"
 BPAK="/etc/portage/backups/package.keywords/"
+mkdir -p "$PAK"
 mkdir -p "$BPAK"
 
 # Restore latest backup if for some godforsaken reason we nuked our use somehow

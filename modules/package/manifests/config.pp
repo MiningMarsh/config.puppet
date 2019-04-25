@@ -4,7 +4,6 @@ class package::config {
 
   $update_portage_name = 'portage-update'
   $update_portage = script::path($update_portage_name)
-  $update_portage_timestamp = persistent::filename('package', 'portage-update-timestamp')
 
   $update_use_name = 'portage-update-use'
   $update_use = script::path($update_use_name)
@@ -22,14 +21,6 @@ class package::config {
 
   $directories.each |String $directory| {
     file { $directory:
-      ensure => directory,
-    } ->
-
-    file { "${directory}/puppet":
-      ensure => directory,
-    } ->
-
-    file { "${directory}/local":
       ensure => directory,
     }
   }

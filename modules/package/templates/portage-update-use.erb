@@ -6,8 +6,9 @@ std/root
 std/lock use
 
 # The package.use directory.
-PUSE="/etc/portage/package.use/local"
+PUSE="/etc/portage/package.use/"
 BUSE="/etc/portage/backups/package.use/"
+mkdir -p "$PAK"
 mkdir -p "$BUSE"
 
 # Restore latest backup if for some godforsaken reason we nuked our use somehow

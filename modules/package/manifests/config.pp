@@ -29,10 +29,6 @@ class package::config {
     ensure => directory,
   } ->
 
-  file { '/etc/portage/package.accept_keywords/puppet':
-    ensure => directory,
-  } ->
-
   file { '/etc/portage/package.accept_keywords/cvs':
     ensure => directory,
   } ->

@@ -23,7 +23,7 @@ class os::all {
     'package',
     'zsh',
     'batch',
-    'zfs',
+    'zfs'
   ]
 
   $features.each |String $feature| {

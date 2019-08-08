@@ -14,6 +14,7 @@ class package::install {
 		'portage',
 		'portage-utils',
 		'smart-live-rebuild',
+		'jq'
 	]
 
 	$packages.each |String $package| {

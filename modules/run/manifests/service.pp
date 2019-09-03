@@ -1,8 +1,6 @@
 class run::service {
-  service { $run::install::package:
-    ensure     => running,
-    enable     => true,
-    hasrestart => true,
-    hasstatus  => true,
+  require openrc
+  openrc::service { $run::install::package: 
+    monitor => '/usr/sbin/cron'
   }
 }

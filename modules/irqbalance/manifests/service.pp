@@ -1,8 +1,6 @@
 class irqbalance::service {
-  service { 'irqbalance':
-    ensure     => running,
-    enable     => true,
-    hasrestart => true,
-    hasstatus  => true,
+  require openrc
+  openrc::service { 'irqbalance':
+    monitor => '/usr/sbin/irqbalance'
   }
 }

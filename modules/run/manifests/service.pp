@@ -1,6 +1,8 @@
 class run::service {
   require openrc
   openrc::service { $run::install::package: 
-    monitor => '/usr/sbin/cron'
+    category => $run::install::category,
+    package => $run::install::package,
+    service => $run::install::package
   }
 }

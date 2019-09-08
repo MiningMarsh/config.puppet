@@ -1,0 +1,13 @@
+# This file is managed by puppet to allow it to hook file installation.
+# Any user made changes here will be overriden. Additionally hook functionality
+# will have to be provided by puppet.
+
+if [ "${EBUILD_PHASE}" == "postinst" ]; then
+	if [[ -x /etc/portage/puppet/${CATEGORY}_${PN} ]]; then 
+		/etc/portage/puppet/${CATEGORY}_${PN}
+	fi
+
+	if [[ -x /etc/portage/package.post_install/${CATEGORY}/${PN} ]]; then 
+		/etc/portage/package.post_install/${CATEGORY}/${PN}
+	fi
+fi

@@ -2,7 +2,8 @@ class batch::service {
   require openrc
 
   openrc::service { "atd":
-    monitor => '/usr/sbin/atd'
+    category => 'sys-process',
+    package => 'at'
   }
 
   openrc::service { "cgconfig": }

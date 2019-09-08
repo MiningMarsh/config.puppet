@@ -4,6 +4,8 @@ class openrc {
   $prefix = '/etc/monit.d' 
   $lib = '/var/lib/monit' 
   $config = '/etc/monitrc'
+  $bashrc = '/etc/portage/bashrc'
+  $hookdir = '/etc/portage/puppet'
 
   package { monit:
     ensure => installed
@@ -33,6 +35,21 @@ class openrc {
 
   service { 'monit':
     ensure => running
+  }
+
+  file { $bashrc:
+    content => file('openrc/bashrc'),
+    ensure => file,
+    owner => root,
+    group => root,
+    mode => '0755' 
+  }
+
+  file { $hookdir:
+    ensure => directory,
+    owner => root,
+    group => root,
+    mode => '0755'
   }
 
   run::entry { 'monit-reload':

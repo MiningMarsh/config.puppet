@@ -10,16 +10,24 @@ class openrc {
   }
 
   file { $lib:
-    ensure => directory
+    ensure => directory,
+    owner => root,
+    group => root,
+    mode => 0700
   } ->
 
   file { $prefix:
-    ensure => directory
+    ensure => directory,
+    owner => root,
+    group => root,
+    mode => 0700
   } ->
 
   file { $config:
     content => file('openrc/monitrc'),
     ensure => file,
+    owner => root,
+    group => root,
     mode => 0700
   } ->
 

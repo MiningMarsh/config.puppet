@@ -1,0 +1,14 @@
+#!/bin/zsh
+. <%= @stdlib %>
+
+std/root
+
+function init_start() {
+  which <%= @binary %> && nohup <%= @binary %> <%= @arguments %> > /dev/null 2>&1
+}
+
+function init_stop() {
+  killall <%= @binary %>
+}
+
+init_$1

@@ -25,7 +25,8 @@ class os::all {
     'batch',
     'zfs',
     'irqbalance',
-    'openrc'
+    'openrc',
+    'arpd'
   ]
 
   $features.each |String $feature| {

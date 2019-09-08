@@ -24,7 +24,7 @@ define openrc::service (
   }
 
   if $monitor != undef {
-    file { "${openrc::prefix}/puppet_${title}":
+    file { "${openrc::prefix}/puppet_service_${title}":
       content => template('openrc/service.erb'),
       ensure => file
     }

@@ -67,7 +67,7 @@ class openrc {
   }
 
   batch::entry { 'monit-reload':
-    command => 'monit reload',
-    period  => daily
+    command => 'bash -c "/sbin/rc-service monit stop; rm /var/lib/monit/state; /sbin/rc-service monit start; monit reload"',
+    period  => hourly
   }
 }

@@ -1,7 +1,7 @@
 # This file is managed by puppet. Local changes to this file will be overriden.
 
 # Start Monit in the background (run as a daemon):
-set daemon 3600
+set daemon 600
 
 # Set syslog logging. If you want to log to a standalone log file instead,
 # specify the full path to the log file

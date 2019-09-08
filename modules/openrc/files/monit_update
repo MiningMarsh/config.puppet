@@ -1,3 +1,3 @@
 #!/usr/bin/env zsh
 
-rc-service monit restart
+/sbin/rc-service monit restart

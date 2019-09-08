@@ -56,4 +56,12 @@ class openrc {
     command => 'monit reload',
     period  => hourly
   }
+
+  file { '/etc/portage/puppet/app-admin_monit':
+    ensure => file,
+    content => file('openrc/monit_update'),
+    owner => root,
+    group => root,
+    mode => '0755'
+  }
 }

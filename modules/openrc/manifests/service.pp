@@ -43,6 +43,10 @@ define openrc::service (
         group => root,
         mode => '0755'
       }
+
+      package { "${category}/${package}":
+        ensure => installed
+      }
     }
   }
 

@@ -1,0 +1,16 @@
+#!/usr/bin/env zsh
+# This file is managed by puppet.
+# This file will remove snapshots supported by zfs-auto-snapshot if the dataset
+# is no longer marked as needing them.
+
+if ! which zfs > /dev/null 2>&1; then
+	exit
+fi
+
+for dataset in $(zfs list -H -o name); do
+	if [[ "$(zfs get com.sun:auto-snapshot $dataset -H -o value)" == true ]]; then
+		continue
+	fi
+
+	zfs list -t snapshot -H -o name | grep $dataset@zfs-auto-snap_ | xargs -rn1 -P12 zfs destroy -R
+done

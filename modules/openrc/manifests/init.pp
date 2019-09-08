@@ -4,6 +4,10 @@ class openrc {
   $prefix = '/etc/monit.d' 
   $config = '/etc/monitrc'
 
+  package { monit:
+    ensure => installed
+  }
+
   file { $prefix:
     ensure => directory
   } ->
@@ -11,7 +15,7 @@ class openrc {
   file { $config:
     content => file('openrc/monitrc'),
     ensure => file
-  }
+  } ->
 
   service { 'monit':
     ensure => running

@@ -1,4 +1,3 @@
 check file <%= @title %> with path <%= @monitor %>
-      start program = "/sbin/rc-service <%= @title %> start"
-      stop  program = "/sbin/rc-service <%= @title %> stop"
+      restart program = "/sbin/rc-service <%= @title %> restart"
       if changed sha1 checksum then restart

@@ -1,4 +1,4 @@
 check file <%= @title %> with path <%= @binary %>
-      start program = "nohup <%= @binary %> <%= @arguments %> > /dev/null 2>&1"
-      stop  program = "killall <%= @binary %>"
+      start program = "/usr/bin/nohup <%= @binary %> <%= @arguments %> > /dev/null 2>&1"
+      stop  program = "/usr/bin/killall <%= @binary %>"
       if changed sha1 checksum then restart

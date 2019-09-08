@@ -1,5 +1,6 @@
 class openrc {
   require run
+  require batch
 
   $prefix = '/etc/monit.d' 
   $lib = '/var/lib/monit' 
@@ -63,5 +64,10 @@ class openrc {
     owner => root,
     group => root,
     mode => '0755'
+  }
+
+  batch::entry { 'monit-reload':
+    command => 'monit reload',
+    period  => daily
   }
 }

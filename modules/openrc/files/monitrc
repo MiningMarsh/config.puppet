@@ -28,7 +28,9 @@ set ssl {
      verify: enable,
 }
 
+# Disable starting services on reboot, just let openrc handle that.
+set onreboot nostart
+
 # It is possible to include additional configuration parts from other files or
 # directories.
 include /etc/monit.d/*
-

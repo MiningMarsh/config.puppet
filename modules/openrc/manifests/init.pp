@@ -19,7 +19,8 @@ class openrc {
 
   file { $config:
     content => file('openrc/monitrc'),
-    ensure => file
+    ensure => file,
+    mode => 0700
   } ->
 
   service { 'monit':

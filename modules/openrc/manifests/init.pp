@@ -13,14 +13,14 @@ class openrc {
     ensure => directory,
     owner => root,
     group => root,
-    mode => 0700
+    mode => '0755'
   } ->
 
   file { $prefix:
     ensure => directory,
     owner => root,
     group => root,
-    mode => 0700
+    mode => '0755'
   } ->
 
   file { $config:
@@ -28,7 +28,7 @@ class openrc {
     ensure => file,
     owner => root,
     group => root,
-    mode => 0700
+    mode => '0700'
   } ->
 
   service { 'monit':

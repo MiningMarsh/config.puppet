@@ -4,10 +4,16 @@
 
 if [ "${EBUILD_PHASE}" == "postinst" ]; then
 	if [[ -x /etc/portage/puppet/${CATEGORY}_${PN} ]]; then 
-		/etc/portage/puppet/${CATEGORY}_${PN}
+		mkdir -p /var/log/portage
+		echo "/etc/portage/puppet/${CATEGORY}_${PN}: $(date '+%s')" >> /var/log/portage/post_install.log
+		/etc/portage/puppet/${CATEGORY}_${PN} >> /var/log/portage/post_install.log 2>&1
+		echo >> /var/log/portage/post_install.log
 	fi
 
 	if [[ -x /etc/portage/package.post_install/${CATEGORY}/${PN} ]]; then 
-		/etc/portage/package.post_install/${CATEGORY}/${PN}
+		mkdir -p /var/log/portage
+		echo "/etc/portage/package.post_install/${CATEGORY}/${PN}: $(date '+%s')" >> /var/log/portage/post_install.log
+		/etc/portage/package.post_install/${CATEGORY}/${PN} >> /var/log/portage/post_install.log 2>&1
+		echo >> /var/log/portage/post_install.log
 	fi
 fi

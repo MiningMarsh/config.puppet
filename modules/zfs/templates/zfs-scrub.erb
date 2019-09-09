@@ -1,4 +1,8 @@
 #!/usr/bin/env zsh
 # This file is managed by puppet. Manual edits will be lost.
 
+if ! which zfs > /dev/null 2>&1; then
+  exit
+fi
+
 zpool list -o name -H | xargs -rn1 zpool scrub

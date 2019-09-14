@@ -31,7 +31,8 @@ define openrc::service (
   service { $title:
     ensure => $ensure,
     hasrestart => $hasrestart,
-    hasstatus => $hasstatus
+    hasstatus => $hasstatus,
+    enable => true
   }
 
   if $package != undef {

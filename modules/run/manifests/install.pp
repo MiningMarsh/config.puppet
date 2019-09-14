@@ -1,5 +1,5 @@
 class run::install {
-  $package = 'vixie-cron'
+  $package = 'cronie'
 
   package { $package:
     ensure => installed,

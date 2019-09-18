@@ -31,4 +31,12 @@ class run::config {
       content => "${seconds}\n",
     }
   }
+
+  # Dirty hack to prevent cronie anacron support from breaking things.
+  file { '/etc/cron.d/0hourly':
+    ensure => absent
+  }
+  file { '/etc/cron.hourly/0anacron':
+    ensure => absent
+  }
 }

@@ -6,6 +6,11 @@ class os::all {
     period  => daily
   }
 
+  run::entry { 'puppet-clean':
+    command => 'if [[ -d /etc/puppetlabs ]]; then rm -rf /etc/puppetlabs; fi',
+    period  => hourly
+  }
+
   run::entry { 'puppet-stdlib':
     command => 'puppet module install puppetlabs-stdlib --target-dir /etc/puppet/modules',
     period  => daily

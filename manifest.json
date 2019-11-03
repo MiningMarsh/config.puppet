@@ -5,7 +5,7 @@
 	"author": "MiningMarsh",
 	"description": "",
 	"dependencies": [
-		"puppet-stdlib",
+		"puppetlabs-stdlib",
 		"puppet-cron"
 	],
 	"types": [],

@@ -53,9 +53,9 @@ class openrc {
     mode => '0755'
   }
 
-  run::entry { 'monit-reload':
+  batch::entry { 'monit-reload':
     command => 'monit reload',
-    period  => hourly
+    period  => daily
   }
 
   file { '/etc/portage/puppet/app-admin_monit':
@@ -64,10 +64,5 @@ class openrc {
     owner => root,
     group => root,
     mode => '0755'
-  }
-
-  batch::entry { 'monit-reload':
-    command => 'bash -c "/sbin/rc-service monit stop; rm /var/lib/monit/state; /sbin/rc-service monit start; monit reload"',
-    period  => hourly
   }
 }

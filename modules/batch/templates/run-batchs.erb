@@ -41,7 +41,7 @@ for file in $(find "$persistent" -type f -iname '*.seconds' -print0); do
     echo >> /var/log/batch.log
     date >> /var/log/batch.log
     date '+%s' >> /var/log/batch.log
-    echo "<%= @batch_once %>" "$(basename "$batch")" "$batch" >> /var/log/batch.log
+    echo "<%= @batch_once %>" "$(basename "$(dirname "$batch")").$(basename "$batch")" "$batch" >> /var/log/batch.log
     "<%= @batch_once %>" "$(basename "$batch")" "$batch" >> /var/log/batch.log 2>&1
   done
 

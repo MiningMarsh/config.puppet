@@ -1,0 +1,16 @@
+#!/bin/zsh
+. <%= @stdlib %>
+
+std/root
+
+function init_start() {
+	rm -rf /mnt/cron
+	mkdir -p /mnt/cron
+        mount -t tmpfs cron /mnt/cron -o defaults,size=8G
+}
+
+function init_stop() {
+        umount /mnt/cron
+}
+
+init_$1

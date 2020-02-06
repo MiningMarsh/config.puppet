@@ -37,7 +37,7 @@ for file in $(find "$persistent" -type f -iname '*.seconds' -print0); do
       continue
     fi
    
-    local lock="$persistent/$period.$(basename "$cron").lock"
+    local lock="/mnt/cron/$period.$(basename "$cron").lock"
 
     if [[ -f "$lock" ]]; then
       continue

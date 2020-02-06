@@ -6,6 +6,9 @@ class package::install {
 		content => template('package/clean-batch.erb')
 	}
 
+	init::script { clean-run:
+		content => template('package/clean-run.erb')
+	}
 
 	$packages = [
 		'eix',

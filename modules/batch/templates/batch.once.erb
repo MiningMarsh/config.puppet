@@ -10,6 +10,10 @@ if [[ ! -e "$homedir" ]]; then
 fi
    
 local lockdir="$homedir/.batch"
+if [[ "$(whoami)" == "root" ]]; then
+  lockdir="/mnt/batch"
+fi
+
 if [[ ! -e "$lockdir" ]]; then
   mkdir -p "$lockdir"
 fi

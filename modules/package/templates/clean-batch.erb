@@ -4,13 +4,13 @@
 std/root
 
 function init_start() {
-	rm -rf /root/.batch
-	mkdir -p /root/.batch
-        mount -t tmpfs batch /root/.batch -o defaults,size=8G
+	rm -rf /mnt/batch
+	mkdir -p /mnt/batch
+        mount -t tmpfs batch /mnt/batch -o defaults,size=8G
 }
 
 function init_stop() {
-        umount /root/.batch
+        umount /mnt/batch
 }
 
 init_$1
